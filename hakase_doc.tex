@@ -1,0 +1,430 @@
+%#! lualatex
+\documentclass[a4paper,luatex]{l3doc}
+\usepackage{luatexja,lltjext}
+\usepackage{luatexja-fontspec}
+\usepackage{luatexja-otf}
+\usepackage{luatexja-ruby}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\hypersetup{pdfencoding=auto}
+%
+%\documentclass[a4paper,uplatex]{l3doc}
+%\usepackage[dvipdfmx]{graphicx}
+%%usepackage[hiragino-elcapitan-pro]{pxchfon}
+%\usepackage{plext,hyperref}
+%\usepackage{pxjahyper}
+%\usepackage[deluxe,expert]{otf}
+%
+\usepackage{geometry}
+\geometry{left=40mm,top=25mm,bottom=20mm}
+\usepackage{bxokumacro}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathmorphing}
+%
+%\usepackage{pxeveryshi}
+\usepackage{hakase}
+\def\fu#1{%
+{%\Large
+  \tanni=1em%
+    \begin{tikzpicture}[x=\tanni,y=\tanni]%,inner sep=0pt]%
+     #1%
+    \end{tikzpicture}%
+}}%
+\def\bs#1{\textbf{\texttt{\symbol{"5C}}#1}}%"
+\title{hakase.sty 使用法}
+\author{髙吉 清文}
+\date{ver.0.1 [\today]}
+\usepackage{multicol}	% required for `\multicols' (yatex added)
+\usepackage{longtable,multirow,fancyvrb}
+\def\youso#1#2#3#4#5{#1&\shortstack{\vspace{0.1ex}\bs{#2}\\
+\bs{#3}}&\verb|#3{\c}|&\fu{#4{#5}}\\\hline
+}
+\begin{document}
+%\和暦
+\maketitle
+\section{はじめに}
+\verb|hakase.sty|は南山進流声明仮譜を描画するために作成された
+p\LaTeX/up\LaTeX 及びlua\LaTeX 用のスタイルファイルである。
+譜の形は岩原諦信師の昭和改版進流魚山蠆芥集に準拠した。
+\section{使用法}
+\subsection{依存するパッケージ}
+このパッケージは主に縦書きで使用することを想定している。
+プリアンブルで以下を読み込むこと。
+\begin{itemize}
+ \item \verb|graphicx.sty|\\
+       図形を扱う為に必要。
+ \item \verb|tikz.sty|\\
+       \verb|\usetikzlibrary{decorations.pathmorphing}|\\
+       譜の作図はこのパッケージとライブラリーを利用。\\
+ \item \verb|pxeveryshi.sty|\\
+       \verb|tikz|を縦書きで使えるようにするパッケージ。\\
+       p\LaTeX/up\LaTeX に必要、lua\LaTeX には不要。
+%       \TeX Liveに標準では含まれていないため
+%       \href{https://gist.github.com/zr-tex8r/2702969}
+%       {https://gist.github.com/zr-tex8r/2702969}より入手。
+ \item \verb|hakase.sty|\\
+       パッケージ本体。
+\end{itemize}
+\subsection{座標、描画単位}
+直交座標は紙面に対して水平方向をx方向とし右向きを正、
+垂直方向をy方向とし上向きを正とする。
+極座標の角度はx軸正方向を0度とし原点を中心に左回りに増加する。
+描画単位\verb|\tanni|の初期値は未定である。\\
+座標の表現は以下の表式を用いる。
+\begin{tabbing}
+直交座標\=：\=\verb|( x座標 , y座標 )|  \=カンマで区切る \\
+極座標\>：\>\verb|( 角度 : 長さ )|\>コロンで区切る	
+\end{tabbing}
+\subsection{描画命令}
+\begin{function}{\hakase}
+ \verb|\hakase{〈音符命令〉}|\\
+ \verb|\hakase[〈音符の単位長〉]{〈音符命令〉}|\\
+〈音符の単位長〉：規定値に対する倍率　例）\verb|\hakase[0.8]{\kak}|\\
+ 声明の譜を描く。\\
+例）これが呂のユリ\verb|\tanni=1em\hakase{\yuriL{\c}}|です。\\
+　　これが呂のユリ\tanni=1em\hakase{\yuriL{\c}}です。
+\end{function}
+\begin{function}{\karifu,\gscale}
+ \verb|\karifu(〈音符右移動〉,〈全体上移動〉)[〈tbc〉]{〈文字列〉}{〈音符命令〉}|\\
+ \verb|\karifu[ ~ ]{ ~ }{ ~ } -> \karifu(0,0)[ ~ ]{ ~ }{ ~ }|\\
+ \verb|\karifu( ~ ){ ~ }{ ~ } -> \karifu( ~ )[ c ]{ ~ }{ ~ }|\\
+ \verb|\karifu{ ~ }{ ~ }      -> \karifu(0,0)[ c ]{ ~ }{ ~ }|
+\begin{tabbing}
+ \verb|〈tbc〉　　　 |\=： 文字と譜の位置揃え、\verb|t:上揃え、b:下揃え、c:中央揃え|\\
+ \verb|〈音符右移動〉|\>：音符のみ右に移動、左は負値。文字間隔の調整に用いる。\\
+ \verb|〈全体上移動〉|\>：文字と音符全体が上に移動、下は負値。親文字に対する相対サイズで指定。\\
+ \verb|\gscale|\>：文字に対する相対サイズ。
+ 描画単位\verb|\tanni=\gscale ×〈文字サイズ〉|。\\
+ \>：初期値は\verb|\gscale=0.5|である。
+\end{tabbing}
+ 縦書きでは、文字の左横に声明仮譜を描く、横書きでは文字の下に描く。\\
+例）呂の\verb|\karifu{ユリ}{\yuriL{\c}}|
+\hspace{2em}\fbox{\hbox{呂の\karifu{ユリ}{\yuriL{\c}}}}\\
+例）呂の\verb|\def\gscale{1}\karifu{ユリ}{\yuriL{\c}}|
+\hspace{2em}\fbox{\hbox{\tate 呂の\def\gscale{1}\karifu{ユリ}{\yuriL{\c}}}}
+\end{function}
+\begin{function}{\Karifu}
+グループ仮符\\
+ \verb|\Karifu[〈tbcリスト〉]{〈文字列リスト〉}{〈音符命令リスト〉}|\\
+ \verb|\Karifu{〈文字列リスト〉}{〈音符命令リスト〉}|\\
+各リストはコンマ区切り。
+\end{function}
+%\begin{function}{\karifu*}
+% \verb|\karifu*(〈x方向変位〉,〈y方向変位〉){〈文字列〉}{〈音符命令〉}|\\
+%描画位置調整期能付き\verb|\karifu|。変位単位は\verb|\tanni|。 
+%\end{function}
+\section{音符命令}
+この節の命令は前節の\verb|\hakase,\karifu|の中で用いる。
+\setlength{\columnseprule}{0.5pt}
+%\begin{multicols}{2}
+\subsection{音階と基本音符}
+\begin{description}
+ \item[音階、音符表]{　}\\
+五音宮商角徴羽は角度を使って表１のように表す。\\
+45度で等分されてないのは見た目を原本に近付けるためとスペースの節約のため
+である。各音階を表す基本音符は音階の角度の方向に引いた直線である。
+今のところ三重の徴は定義していない。
+
+\begin{tabular}[t]{|c|c|c|}
+\multicolumn{3}{c}{表1.{\bf 音階表}}\\\hline
+ 音階名&角度 &命令 \\\hline\hline
+ 初重徴&360 &{\bf \verb|\lc|} \\\hline
+ 初重羽&320 &{\bf \verb|\lw|} \\\hline
+ 二重宮&270 &{\bf \verb|\q|} \\\hline
+ 二重商&230 &{\bf \verb|\s|} \\\hline
+ 二重角&180 &{\bf \verb|\k|} \\\hline
+ 二重徴&140 &{\bf \verb|\c|} \\\hline
+ 二重羽&90 &{\bf \verb|\w|} \\\hline
+ 三重宮&40 &{\bf \verb|\hq|} \\\hline
+ 三重商&0 &{\bf \verb|\hs|} \\\hline
+ 三重角&-45 &{\bf \verb|\hk|} \\\hline
+\end{tabular}
+\ifluatex \hspace{2\zw}
+\else \hspace{2zw}
+\fi
+\begin{tabular}[t]{|c|c|c|}
+\multicolumn{3}{c}{表2.{\bf 基本音符}}\\\hline
+音階名&命 令&別 名\\\hline\hline
+初重徴 & {\bf \verb|\lchi|} & {\bf \verb|\初徴|} \\\hline
+初重羽&{\bf \verb|\lwoo|}&{\bf \verb|\初羽|} \\\hline
+二重宮&{\bf \verb|\qyu|}&{\bf \verb|\宮|} \\\hline
+二重商&{\bf \verb|\sho|}&{\bf \verb|\商|} \\\hline
+二重角&{\bf \verb|\kak|}&{\bf \verb|\角|} \\\hline
+二重徴&{\bf \verb|\chi|}&{\bf \verb|\徴|} \\\hline
+二重羽&{\bf \verb|\woo|}&{\bf \verb|\羽|} \\\hline
+三重宮&{\bf \verb|\hqyu|}&{\bf \verb|\三宮|} \\\hline
+三重商&{\bf \verb|\hsho|}&{\bf \verb|\三商|} \\\hline
+三重角&{\bf \verb|\hkak|}&{\bf \verb|\三角|}\\\hline
+\end{tabular} 
+\begin{tabular}[t]{|c|c|c|}
+\multicolumn{3}{c}{揚羽/揚商/反徴/反宮}\\\hline
+音階名&命 令&別 名\\\hline\hline
+&&\\\hline
+揚初羽 &\verb|\yolwoo|&\verb|\揚初羽|\\\hline
+反宮&\verb|\hnqyu|&\verb|\反宮|\\\hline
+揚商 &\verb|\yosho|&\verb|\揚商|\\\hline
+&&\\\hline
+反徴&\verb|\hnchi|&\verb|\反徴|\\\hline
+揚羽 &\verb|\yowoo|&\verb|\揚羽|\\\hline
+反三宮&\verb|\hnhqyu|&\verb|\反三宮|\\\hline
+揚三商 &\verb|\yohsho|&\verb|\揚三商|\\\hline
+&&\\\hline
+\end{tabular}
+
+長さの規定の基本単位は英字サイズの半分。\\
+連続した命令は連結した楽譜を出力。
+ \item[例]{\verb|\tanni=1em|}\\
+\tanni=1em
+\begin{tabular}{ll}
+ ソース\ifluatex\hspace{15\zw}\else\hspace{15zw}\fi&出力\\\hline
+ {\bf\verb|\hakase{\宮}|}&\hakase{\宮}\\
+ {\bf\verb|\hakase{\商}|}&\hakase{\商}\\
+ {\bf\verb|\hakase{\宮\商\角\徴}|}&\hakase{\宮\商\角\徴}\\
+ {\bf\verb|\hakase{\羽\揚羽\三宮}|}&\hakase{\羽\揚羽\三宮}\\\hline
+\end{tabular}
+\end{description}
+%\end{multicols}
+\subsection{音の装飾を指定する音符}
+作図命令の基本パターンは
+ \begin{quote}
+  \bs{音符命令\{音階\}}
+ \end{quote}
+である。以下使用可能な命令を表にまとめる。音符命令欄が複数行になっている時は
+別名が定義されている。\verb|*|がついた名前は音符を区別するために便宜上命名した
+仮の名前である。
+
+\begin{longtable}{|l|c|c|c|}\hline
+%種類&書式&使用例&結果\\\hline\hline
+名前&音符命令&使用例&結果
+\endfirsthead
+\multicolumn{4}{l}{\small\slshape continued from previous page} \\
+\hline
+名前&音符命令&使用例&結果 \\
+\hline\hline
+\endhead
+\hline
+\multicolumn{4}{r}{\small\slshape table continued on next page} \\
+\endfoot
+\hline
+\endlastfoot
+\hline
+律のユリ&\verb|\yuriR|&\verb|\律由{\c}|&\multirow{2}{*}{\fu{\律由{\c}}}\\\nopagebreak
+&\verb|\律由|&&\\\hline
+呂のユリ&\verb|\yuriL|&\verb|\呂由{\c}|&\multirow{2}{*}{\fu{\呂由{\c}}}\\\nopagebreak
+&\verb|\呂由|&&\\\hline
+由下&\verb|\yuge|&\verb|\由下{\c}|&\multirow{2}{*}{\fu{\由下{\c}}}\\\nopagebreak
+&\verb|\由下|&&\\\hline
+ツキユリ&\verb|\tsukiyuri|&\verb|\ツキユリ{\c}|&\multirow{2}{*}{\fu{\ツキユリ{\c}}}\\\nopagebreak
+&\verb|\ツキユリ|&&\\\hline
+力のソリ&\verb|\chikara|&\verb|\力{\s}|&\multirow{2}{*}{\fu{\力{\s}}}\\\nopagebreak
+&\verb|\力|&&\\\hline
+ソリ&\verb|\sori|&\verb|\ソリ{\s}|&\multirow{2}{*}{\fu{\ソリ{\s}}}\\\nopagebreak
+&\verb|\ソリ|&&\\\hline
+ソル&\verb|\soru|&\verb|\ソル{\s}|&\multirow{2}{*}{\fu{\ソル{\s}}}\\\nopagebreak
+&\verb|\ソル|&&\\\hline
+ソリハネ&\verb|\sorihane|&\verb|\ソリハネ{\w}|&\multirow{2}{*}{\fu{\ソリハネ{\w}}}\\\nopagebreak
+&\verb|\ソリハネ|&&\\\hline
+ソリキリ&\verb|\sorikiri|&\verb|\ソリキリ{\s}|&\multirow{2}{*}{\fu{\ソリキリ{\s}}}\\\nopagebreak
+&\verb|\ソリキリ|&&\\\hline
+ユリソリ&\verb|\yurisori|&\verb|\ユリソリ{\s}|&\multirow{3}{*}{\fu{\由ソ{\s}}}\\\nopagebreak
+&\verb|\ユリソリ|&&\\\nopagebreak
+&\verb|\由ソ|&&\\\hline
+荒由&\verb|\arayu|&\verb|\荒由{\c}|&\multirow{2}{*}{\fu{\荒由{\c}}}\\\nopagebreak
+&\verb|\荒由|&&\\\hline
+ユリカケ切り&\verb|\yurikake|&\verb|\ユリカケ{\c}|&\multirow{3}{*}{\fu{\ユリカケ{\c}}}\\\nopagebreak
+&\verb|\ユリカケ|&&\\\nopagebreak
+&&&\\\hline
+イロ&\verb|\iro|&\verb|\イロ{\k}|&\multirow{2}{*}{\fu{\イロ{\k}}}\\\nopagebreak
+&\verb|\イロ|&&\\\hline
+イロトメ\verb|*|&\verb|\irotome|&\verb|\イロトメ{\k}|&\multirow{2}{*}{\fu{\イロトメ{\k}}}\\\nopagebreak
+&\verb|\イロトメ|&&\\\hline
+%イロ二\verb|*|&\verb|\ironi|&\verb|\イロ二{\k}|&\multirow{2}{*}{\fu{\イロ二{\k}}}\\\nopagebreak&\verb|\イロ二|&&\\\hline
+イロ上\verb|*|&\verb|\iroage|&\verb|\イロ上{\k}|&\multirow{2}{*}{\fu{\イロ上{\k}}}\\\nopagebreak
+&\verb|\イロ上|&&\\\hline
+%イロ下\verb|*|&\verb|\irosage|&\verb|\イロ下{\k}|&\multirow{2}{*}{\fu{\イロ下{\k}}}\\\nopagebreak&\verb|\イロ下|&&\\\hline
+イロハネ\verb|*|&\verb|\irohane|&\verb|\イロハネ{\k}|&\multirow{2}{*}{\fu{\イロハネ{\k}}}\\\nopagebreak&\verb|\イロハネ|&&\\\hline
+ハヌル&\verb|\hanuru|&\verb|\ハヌル{\s}|&\multirow{2}{*}{\fu{\ハヌル{\s}}}\\\nopagebreak
+&\verb|\ハヌル|&&\\\hline
+下ゲモドリ\verb|*|&\verb|\sagemodori|&\verb|\下ゲモドリ{\hq}|&\multirow{2}{*}{\fu{\下ゲモドリ{\hq}}}\\\nopagebreak
+&\verb|\下ゲモドリ|&&\\\hline
+フリユリ&\verb|\furiyuri|&\verb|\フリユリ{\k}|&\multirow{2}{*}{\fu{\フリユリ{\k}}}\\\nopagebreak
+&\verb|\フリユリ|&&\\\hline
+四由&\verb|\shiyu|&\verb|\四由{\k}|&\multirow{2}{*}{\fu{\四由{\k}}}\\\nopagebreak
+&\verb|\四由|&&\\\hline
+フル&\verb|\furu|&\verb|\フル{\s}|&\multirow{2}{*}{\fu{\フル{\s}}}\\\nopagebreak
+&\verb|\フル|&&\\\hline
+ユリアゲ\verb|*|&\verb|\yuriage|&\verb|\ユリアゲ{\c}|&\multirow{2}{*}{\fu{\ユリアゲ{\c}}}\\\nopagebreak
+&\verb|\ユリアゲ|&&\\\hline
+根音&\verb|\negoe|&\verb|\根音{\c}|&\multirow{2}{*}{\fu{\根音{\c}}}\\\nopagebreak
+&\verb|\根音|&&\\\hline
+引ク\verb|*|&\verb|\hiku|&\verb|\引ク{\s}|&\multirow{2}{*}{\fu{\引ク{\s}}}\\\nopagebreak
+&\verb|\引ク|&&\\\hline
+押ス&\verb|\osu|&\verb|\押ス{\c}|&\multirow{2}{*}{\fu{\押ス{\c}}}\\\nopagebreak
+&\verb|\押ス|&&\\\hline
+大ユ&\verb|\ooyu|&\verb|\大ユ{\q}|&\multirow{2}{*}{\fu{\大ユ{\q}}}\\\nopagebreak
+&\verb|\大ユ|&&\\\hline
+ツヤ&\verb|\tsuya|&\verb|\ツヤ{\s}|&\multirow{2}{*}{\fu{\ツヤ{\s}}}\\\nopagebreak
+&\verb|\ツヤ|&&\\\hline
+ツヤモチ\verb|*|&\verb|\tsuyamochi|&\verb|\ツヤモチ{\s}|&\multirow{2}{*}{\fu{\ツヤモチ{\s}}}\\\nopagebreak&\verb|\ツヤモチ|&&\\\hline
+ユルグ&\verb|\yurugu|&\verb|\ユルグ{\s}|&\multirow{2}{*}{\fu{\ユルグ{\s}}}\\\nopagebreak
+&\verb|\ユルグ|&&\\\hline
+アタル&\verb|\ataru|&\verb|\アタル{\k}|&\multirow{2}{*}{\fu{\アタル{\k}}}\\\nopagebreak
+&\verb|\アタル|&&\\\hline
+打付&\verb|\uchitsuke|&\verb|\打付{\s}|&\multirow{2}{*}{\fu{\打付{\s}}}\\\nopagebreak
+&\verb|\打付|&&\\\hline
+カカル&\verb|\kakaru|&\verb|\カカル{\k}|&\multirow{2}{*}{\fu{\カカル{\k}}}\\\nopagebreak
+&\verb|\カカル|&&\\\hline
+受音&\verb|\ukekoe|&\verb|\受音{\k}|&\multirow{2}{*}{\fu{\受音{\k}}}\\\nopagebreak
+&\verb|\受音|&&\\\hline
+折捨&\verb|\orisute|&\verb|\woo\折捨{\k}|&\multirow{2}{*}{\fu{\woo\折捨{\w}}}\\\nopagebreak
+&\verb|\折捨|&&\\\hline
+\end{longtable}
+\subsection{その他の音符}
+\leftmargini=0pt
+ %\item[戻り]{　}
+\begin{function}{\modori*,\modori,\戻,\モドリ,\modoli}
+ \verb|\modori*(〈音階方向〉:〈音符長〉)[〈連結部〉]|\\
+ \verb|\modori{〈相対音階〉}[〈連結部〉]|\\
+ \verb|\modori{〈相対音階〉}|\\
+ \verb|\modori = \modori{-135}, \modori{-145}:商音のみ|\\
+ \verb|\戻　　 = \modori の別名|\\
+ \verb|\モドリ = \modori の別名|\\
+\begin{tabbing}
+ 音階\=方向\=：音階を表す角度 \\
+ 相対\>音階\>：現在の音階に対する相対角度 \\
+ 音符\>長\>：\verb|1\tanni|の倍数\\
+ 連結\>部\>：繋ぎ空白の伸びる方向\\
+ \>p\>：前音階方向に空白が伸長後戻り符を描画\\
+ \>n\>：前符終点で屈曲後モドリ音階方向に空白が伸長\\
+ \>他\>：前符とモドリの中間で折れ曲がる
+\end{tabbing}
+ 連続する音符が干渉する場合のために
+ 戻り角度と始点の位置を変えた戻りも定義している。\\
+ \verb|\modoli = \modori{-110}[p]|\\[5truemm]
+例）\verb|\角\modori\角|\hspace{2em}\fu{\kak\modori\kak}
+\end{function}
+ %\item[イロ戻り]{　}
+\begin{function}{\iromodori,\イロモドリ}
+ \verb|\iromodori{〈音階方向〉}|\\
+ \verb|\iromodori = \iromodori{-135}|\\
+ \verb|\イロモドリ = \iromodoriの別名|\\[5truemm]
+例）\verb|\角\iromodori\角|\hspace{2em}\parbox{2cm}{\fu{\kak\iromodori\kak}}
+\end{function} 
+ %\item[息継ぎ]{　}
+\begin{function}{\kiri,\きり}
+\textbf{切り、息継ぎ}\\
+ 音階方向に向かって右側にマーク\\
+ \verb|\kiri[〈方位指定〉]|\\
+ \verb|\kiri  =  \kiri[〈現在の音階の角度〉- 90]|\\
+ \verb|\きり  =  \kiriの別名|\\
+ 方位指定方法は前述。\\
+ 例）\verb|\chi\kiri\chi|\hspace{2em}\parbox{2cm}{\fu{\chi\kiri\chi}}
+\end{function} 
+\begin{function}{\kili,\キリ}
+ 音階方向に向かって左側にマーク\\
+ \verb|\kili[〈方位指定〉]| \\
+ \verb|\kili  =  \kiri[〈現在の音階の角度〉+ 90]|\\
+ \verb|\キリ  =  \kiliの別名|\\
+例）\verb|\chi\kili\chi|\hspace{2em}\parbox{2cm}{\fu{\chi\kili\chi}}
+\end{function} 
+
+ %\item[ツマル音]{　}
+\begin{function}{\tsu}
+ \verb|\tsu|\\
+ ツマル音\\
+ 例）\verb|\chi\tsu|\hspace{2em}\parbox[t]{2cm}{\fu{\chi\tsu}}
+\end{function} 
+\begin{function}{\mawasu,\マワス}
+ \textbf{マワス}一音ずつ連続的に音を下げる\\
+ \verb|\mawasu[〈回数〉]{〈初期音階〉}| \\
+ \verb|\マワス  \mawasu の別名| \\
+例）\verb|\mawase[3]{\w}|\hspace{2em}\parbox{2cm}{\fu{\mawasu[3]{\w}}}
+\end{function}
+\begin{function}{\jige,\自下}
+ \verb|\jige|\\
+ \verb|\自下|\\
+ 本自下
+\hspace{2em}\parbox{2cm}{\fu{\jige}}
+\end{function}
+\begin{function}{\nakaoroshi,\中下}
+\verb|\nakaoroshi{〈音階方向〉}|\\
+\verb|\nakaoroshi  =  \nakaoroshi{\k}|\\
+\verb|\中下  =  \nakaoroshi の別名|
+\hspace{2em}\parbox[b]{2cm}{\fu{\nakaoroshi}}
+\end{function}
+\begin{function}{\nagashi,\流し}
+\verb|\nagashi{〈音階方向〉}|\\
+\verb|\nagashi  =  \nagashi{\k}|\\
+\verb|\流し  =  \nagashi の別名|
+\hspace{2em}\parbox[b]{2cm}{\fu{\nagashi}}
+\end{function}
+\begin{function}{\kakari,\カカリ}
+\verb|\kakari{〈音階方向〉}|\\
+\verb|\カカリ  =  \kakari の別名|
+\hspace{2em}\parbox[b]{2cm}{\fu{\kakari{\s}}}
+\end{function}
+\begin{function}{\kanaatari,\カナ当リ}
+\verb|\kanaatari{〈音階方向〉}|\\
+\verb|\kanaatari  =  \kanaatari{\c}|\\
+\verb|\カナ当　  =  \kanaatari の別名|\\
+\verb|\カナ当リ  =  \kanaatari の別名|
+\hspace{2em}\parbox[b]{2cm}{\fu{\kanaatari}}\\
+\verb|\kanaAtari  =  \kanaatari\nl{0.7}\chi|
+\hspace{2em}\parbox[b]{2cm}{\fu{\kanaAtari}}
+\end{function}
+\subsection{移動命令}
+%\begin{function}{\move}
+% \verb|\move(〈x座標〉,〈y座標〉)|\\
+%次の描画開始位置を\verb|(x,y)|にする。描画平面右下隅を\verb|(0,0)|とした絶対座標。単位は\verb|\tanni|。 
+%\end{function}
+\begin{function}{\moveTo}
+ \verb|\moveTo(〈x方向変位〉,〈y方向変位〉)|：
+ 現在位置からの相対移動。
+\end{function}
+\begin{function}{\kaigyo,\nl}
+ \verb|\kaigyo{〈改行数〉}|：
+ 次の描画開始位置を-y方向に\verb|〈改行数〉\tanni|ずらす。\\
+ \verb|\kaigyo|：次の描画開始原点を-y方向に\verb|1\tanni|ずらす。\\
+ \verb|\nl|　　：同上
+\end{function}
+\begin{function}{\aki}
+\verb|\aki[〈変位〉]{〈進行方向〉}|：現在の位置から〈進行方向〉へ\verb|〈変位〉\tanni|相対移動 \\ 
+\verb|\aki{〈進行方向〉}|：現在の位置から〈進行方向〉へ\verb|0.5\tanni|相対移動\\
+\verb|\aki|：現在の位置から現在の描画進行方向(音階方向)へ\verb|0.5\tanni|相対移動\\
+音譜と音符の間に空白を入れる。
+\end{function}
+\subsection{文字出力}
+% \item[文字出力]
+\begin{function}{\moji}
+ \verb|\moji(〈相対x〉,〈相対y〉)[〈方位〉]{〈文字列〉}|\\
+ \verb|\moji[〈方位〉]{〈文字列〉}  =  \moji(0,0)[方位]{文字列}|\\
+ 相対座標は音階方向をx軸正方向、それに垂直右方向をy軸正方向とする。
+ 現在の描画位置から変位\verb|(x,y)|だけ移動した位置で指定した方位に文字を出力する。
+ y軸方向の文字描画開始位置はあらかじめずらしてあるので微調整のために使用されたし。\\
+\textbf{方位}\\
+ 方位は紙面上方を北とし、 8等分した方位をアルファベット又は数字で指定する。\\
+ \begin{tabular}{|c|c|c|c|c|c|c|c|}\hline
+  東&北東&北&北西&西&南西&南&南東\\\hline
+  e&ne&n&nw&w&sw&s&se\\\hline
+  0&1&2&3&4&5&6&7\\\hline
+ \end{tabular}\\
+ 例）\verb|\chi\chi\moji(-0.3,0)[ne]{長}|\hspace{2em}\tanni=1em\hakase{\chi\chi\moji(-0.3,0)[ne]{長}}
+\end{function}
+\begin{function}{\chou,\長,\tann,\矢}
+ \textbf{長短}：音の長さを指定\\
+ \verb|\chou[〈方位指定〉]|\\
+ \verb|\長  =  \chou の別名|\\
+ \verb|\tann[〈方位指定〉]|\\
+ \verb|\矢  =  \tann の別名、短の字の偏(へん)|\\
+ 例）\verb|\chi\矢[sw]\chi\長[ne]|\hspace{2em}\tanni=1em\hakase{\chi\矢[sw]\chi\長[ne]}
+\end{function}
+
+\begin{function}{\hikidashi}
+音譜と文字列を線で繋ぐ\\
+ \verb|\hikidashi(〈x1〉,〈y1〉)(〈x2〉,〈y2〉)[〈方位〉]{〈文字列〉}|\\
+ \verb|\hikidashi(〈x1〉,〈y1〉)(〈x2〉,〈y2〉){〈文字列〉}|\\
+ \verb|\hikidashi(〈x〉,〈y〉)[〈方位〉]{〈文字列〉}|\\
+ \verb|\hikidashi(〈x〉,〈y〉){〈文字列〉}  =  \hikidashi(x,0)(x,y)[s]{文字列}|\\
+現在の位置から相対座標\verb|(x1,y1)|を経由して\verb|(x2,y2)|まで折線を引き、\verb|(x2,y2)|の周囲の指定した方向を起点に文字列を出力する。方位の規定値は南である。
+\end{function}
+\end{document}
