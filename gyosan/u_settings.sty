@@ -1,0 +1,44 @@
+\usepackage{lltjp-geometry}
+\usepackage[nohead,top=5truemm,bottom=5truemm,left=10truemm,right=10truemm]{geometry}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage[deluxe,expert,uplatex]{otf}
+\usepackage[noalphabet]{pxchfon}
+\setminchofont{DFGyoShoPro5-W3.otf}
+\setmediumminchofont{DFGyoShoPro5-W5.otf}
+\setboldminchofont{DFGyoShoPro5-W5.otf}
+\usepackage{pxrubrica}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathmorphing}
+\usepackage{pxeveryshi}
+\usepackage{color}
+\usepackage{multicol}
+%
+% 藤田晋作氏謹製
+\usepackage{sfkanbun}
+%\usepackage{sfsyoten-u}% sfsyoten.sty uplatex対応
+\usepackage{../shisei}% syotexvi,furichuのみ抽出、声点位置改変
+\usepackage{warichu}
+\hamidashitrue
+\let\furichukatuji=\huge
+%
+\usepackage{../hakase}
+\setlength{\columnsep}{5truemm}%：コラムの間隔
+\setlength{\columnseprule}{0.3pt}%：コラム分割線幅
+%%%%%%%%%%%%%%%%%%%%%%%%%% poor man's outline %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\pmoutlinefnt#1{\setbox0=\hbox{#1}%
+   \setbox1=\hbox{\kern-.020em\copy0\kern-\wd0\kern.020em\copy0%
+   \kern-\wd0\kern.020em\copy0}$
+   \copy1\kern-\wd1\raise.020em\copy1\kern-\wd1\raise-.020em\copy1%
+   \color[rgb]{1,1,1}\kern-\wd0\kern-.020em\box0
+$}
+\pagestyle{empty}
+\makeatletter
+\newcommand{\shosa}[2]{{\linespread{0.5} \selectfont 
+\parbox[c]{#1}{#2}}}
+\def\tsume{\hspace{-0.2zw}}
+\makeatother
+\def\gscale{0.4}
+\def\shotenratio{0.4}
+\let\warisize=\wari
+\def\kugiri{{\small \textbf{○}}\hspace{0.2zw}}
+\rubyfontsetup{\mcfamily}
