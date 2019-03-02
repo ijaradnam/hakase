@@ -18,8 +18,8 @@
 \usepackage{geometry}
 \geometry{left=40mm,top=25mm,bottom=20mm}
 \usepackage{bxokumacro}
-\usepackage{tikz}
-\usetikzlibrary{decorations.pathmorphing}
+%\usepackage{tikz}
+%\usetikzlibrary{decorations.pathmorphing}
 %
 %\usepackage{pxeveryshi}
 \usepackage{hakase}
@@ -53,17 +53,19 @@ p\LaTeX/up\LaTeX 及びlua\LaTeX 用のスタイルファイルである。
 \begin{itemize}
  \item \verb|graphicx.sty|\\
        図形を扱う為に必要。
+ \item \verb|hakase.sty|\\
+       パッケージ本体。
  \item \verb|tikz.sty|\\
        \verb|\usetikzlibrary{decorations.pathmorphing}|\\
        譜の作図はこのパッケージとライブラリーを利用。\\
+       \textbf{パッケージ本体で読み込まれる。}
  \item \verb|pxeveryshi.sty|\\
        \verb|tikz|を縦書きで使えるようにするパッケージ。\\
-       p\LaTeX/up\LaTeX に必要、lua\LaTeX には不要。
+       p\LaTeX/up\LaTeX に必要、lua\LaTeX には不要。\\
+       \textbf{パッケージ本体で読み込まれる。}
 %       \TeX Liveに標準では含まれていないため
 %       \href{https://gist.github.com/zr-tex8r/2702969}
 %       {https://gist.github.com/zr-tex8r/2702969}より入手。
- \item \verb|hakase.sty|\\
-       パッケージ本体。
 \end{itemize}
 \subsection{座標、描画単位}
 直交座標は紙面に対して水平方向をx方向とし右向きを正、

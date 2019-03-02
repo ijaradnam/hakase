@@ -1,7 +1,10 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{lhakase}
+\ProvidesPackage{hakase}[2019/03/02]
 \RequirePackage{ifluatex,xparse}
 \@ifundefined{iftdir}{\def\iftdir{\ifnum\numexpr\ltjgetparameter{direction}-(\ltjgetparameter{direction}/8)*8=3}}{}
+\RequirePackage{tikz}
+\usetikzlibrary{decorations.pathmorphing}
+\ifluatex\else\RequirePackage{pxeveryshi}\fi
 %
 % hakase.sty
 %
