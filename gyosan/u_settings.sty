@@ -1,5 +1,6 @@
 \usepackage{lltjp-geometry}
-\usepackage[nohead,top=5truemm,bottom=5truemm,left=10truemm,right=10truemm]{geometry}
+\usepackage%[nohead,top=5truemm,bottom=5truemm,left=10truemm,right=10truemm]
+[left=2cm,right=2cm]{geometry}
 \usepackage[dvipdfmx]{graphicx}
 \usepackage[deluxe,expert,uplatex]{otf}
 \usepackage[noalphabet]{pxchfon}
@@ -14,17 +15,17 @@
 \usepackage{multicol}
 %
 % 藤田晋作氏謹製
-\usepackage{sfkanbun}
-%\usepackage{sfsyoten-u}% sfsyoten.sty uplatex対応
-\usepackage{../shisei}% syotexvi,furichuのみ抽出、声点位置改変
-\usepackage{warichu}
+\usepackage{fujita/sfkanbun}% utf
+\usepackage{fujita/sfsyoten-u}% sfsyoten.sty uplatex対応
+%\usepackage{../lshisei}% syotexvi,furichuのみ抽出、声点位置改変
+\usepackage{fujita/warichu}% utf
 \hamidashitrue
 \let\furichukatuji=\huge
 %
 \usepackage{../hakase}
 \setlength{\columnsep}{5truemm}%：コラムの間隔
 \setlength{\columnseprule}{0.3pt}%：コラム分割線幅
-%%%%%%%%%%%%%%%%%%%%%%%%%% poor man's outline %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%% poor man's outline %% 白抜き文字 %%%%%%%%%%%%%%%%%%%%
 \def\pmoutlinefnt#1{\setbox0=\hbox{#1}%
    \setbox1=\hbox{\kern-.020em\copy0\kern-\wd0\kern.020em\copy0%
    \kern-\wd0\kern.020em\copy0}$

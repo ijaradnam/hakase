@@ -1,19 +1,24 @@
-\documentclass[b4j,landscape,uplatex]{utarticle}
+\RequirePackage{plautopatch}
+\documentclass[b5j,landscape,uplatex]{utarticle}
 \usepackage{subfiles}
 \usepackage{u_settings}
 \begin{document}
-\begin{multicols*}{2}
+%\begin{multicols*}{2}
 {\HUGE\noindent
 %總禮伽陀\\[5truemm]%
 %\subfile{s_sourai}\\
 散華\\[5truemm]
 \subfile{s_sange}\\
-%\subfile{s_dainichi}\\
-\subfile{s_shaka}\\%大般若
+%%\subfile{s_dainichi}\\
+%\newpage
+{\huge 釈迦}\\[5truemm]
+\subfile{s_shaka_s}\\%大般若
+%\newpage
+{\huge 回向}\\[5truemm]
 \subfile{s_sange_ekou}\\
 對揚\\[5truemm]
-%\subfile{s_taiyou}\\
+%%\subfile{s_taiyou}\\
 \subfile{s_hannya_taiyou}\\%大般若
 }
-\end{multicols*}
+%\end{multicols*}
 \end{document}
