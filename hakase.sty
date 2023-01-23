@@ -3,8 +3,9 @@
 \RequirePackage{ifluatex,xparse}
 \@ifundefined{iftdir}{\def\iftdir{\ifnum\numexpr\ltjgetparameter{direction}-(\ltjgetparameter{direction}/8)*8=3}}{}
 \RequirePackage{tikz}
-\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{decorations.pathmorphing,backgrounds}
 \ifluatex\else\RequirePackage{pxeveryshi}\fi
+%\RequirePackage{ex@for}
 %
 % hakase.sty
 %
@@ -63,9 +64,10 @@
 \gdef\p@cap{0}%前図cap長
 \newdimen\tanni%描画単位
 \gdef\@kern{0.}%親字博士間隔
-\gdef\gscale{0.5}
+\gdef\gscale{0.5}% \tanni=\gscale*親文字サイズ
 %\setlength\tanni{0.5em}%
 \gdef\@xmax{0}\gdef\@ymin{0}
+\gdef\mojisize{0.8}% 図中文字サイズ=\mojisize\tanni
 %-------------------
 % 線幅規定値
 %------------------- 
@@ -74,7 +76,7 @@
 \gdef\haba{0.12}\Mul{\haba}{0.5}{\@cap}%ユリ等曲線
 \gdef\haban{0.09}\Mul{\haban}{0.5}{\@capn}%モドリ
 \Add{\haba}{0.15}{\habay}\Mul{\habay}{0.5}{\@capy}%揚音符
-\gdef\sukima{0.06}%譜連結間隔
+\gdef\sukima{0.05}%譜連結間隔
 \gdef\@okuri{0}%描画送り幅
 \gdef\nagasa{0.7}%基本音符長
 \gdef\yonagasa{0.5}%揚音符長
@@ -87,7 +89,7 @@
   \def\lc{360}%初重微
   \def\lw{320}%初重羽%315
   \def\q{270}%二重宮
-  \def\s{235}%二重商%225
+  \def\s{230}%二重商%225
   \def\k{180}%二重角
   \def\c{140}%二重微%135
   \def\w{90}%二重羽
@@ -118,7 +120,7 @@
   % 寸法を 親文字サイズに固定%
   \hbox{\vtop{%
         \hbox to\wd1{#3}%
-  	\nointerlineskip
+  	\nointerlineskip%
 	\kern#1%
   	\hbox to\wd1{%
 	   \if#2t{#4\hss}\else%
@@ -139,7 +141,7 @@
   \ifdim\wd1>\wd3
      \hbox{\vtop{%
         \hbox to\wd1{#3}%
-        \nointerlineskip
+        \nointerlineskip%
         \kern#1%
         \hbox to\wd1{%
            \if#2t{#4\hfil}\else%
@@ -152,7 +154,7 @@
            \if#2t{#3\hfil}\else%
            \if#2b{\hfil#3}\else{\hfil#3\hfil}\fi\fi%
 	}%
-        \nointerlineskip
+        \nointerlineskip%
         \kern#1%
         \hbox to\wd3{#4}%
      }}%
@@ -212,14 +214,14 @@
 }%
 \def\hakase{\@ifnextchar[{\@hakase}{\@@hakase}}%
 \def\@hakase[#1]#2{%
-  \let\@@tanni=\tanni
+  \let\@@tanni=\tanni%
   \tanni=#1\tanni%
 %  \let\@zx=\ax%
 %  \let\@zy=\ay%
   \iftdir\rensuji[r]{\@picture{#2}}\else\@picture{#2}\fi%
 %  \let\ax=\@zx%
 %  \let\ay=\@zy%
-  \let\tanni=\@@tanni
+  \let\tanni=\@@tanni%
 }%
 \def\@@hakase#1{%
  %\tanni=0.5em%
@@ -232,11 +234,11 @@
 %-------------------------
 % \karifu{ 親字 }{ 博士 }
 % \karifu[ tcb ]{ 親字 }{ 博士 }
-% \karifu( 博士右移動 , 親字上移動 )[ tcb ]{ 親字 }{ 博士 } 単位は親字サイズ
+% \karifu( 博士右移動 , 親字上移動 )[ tcb ]{ 親字 }{ 博士 }< 初期x , 初期y > 単位は親字サイズ
 %-------------------------
 %\def\karifu@{\@ifnextchar({\@karifu}{\@@karifu}}%
 %
-\def\@karifu(#1,#2)[#3]#4#5{%
+\def\@karifu(#1,#2)[#3]#4#5<#6,#7>{%
   \dimen0=\f@size\p@\tanni=\gscale\dimen0%
 %  \hspace{#2\dimen0}%
   \hspace{-#2\dimen0}%2018/1/19
@@ -244,36 +246,37 @@
   \Sub{\@kern}{#1}{\@kern@x}%2018/1/19
   \urubi[\@kern@x\dimen0]<#3>{#4}{%
 %\fboxsep=0pt\fbox{%
-   \hakase{\orig{1}{0}#5}%2019/1/11
+   \hakase{\orig{#6}{#7}#5}%2019/1/11
 %}%
  }%
 }%
 %\def\@@karifu{\@ifnextchar\bgroup{\@@@karifu}{\@@@@karifu}}%
 %\def\@@@karifu#1#2{\@karifu(0,0)[c]{#1}{#2}}%
 %\def\@@@@karifu[#1]#2#3{\@karifu(0,0)[#1]{#2}{#3}}%
-\NewDocumentCommand\karifu@{D(){0,0} O{c} m m }{\@karifu(#1)[#2]{#3}{#4}}
+\NewDocumentCommand\karifu@{D(){0,0} O{c} m m D<>{1,0}}{\@karifu(#1)[#2]{#3}{#4}<#5>}%
 %-------------------------------
 % 親字に対する博士の相対移動
 % 正方向　(左,上)
 % \karifu*[<字間変化>](<左右移動>,<上下移動>){<親字>}{<博士>}
 %-------------------------------
-\def\orig#1#2{%
-   \draw[draw opacity=0](0,0)--(#1,-#2);
+\def\orig#1#2{%博士の右に文字領域を確保、文字が無い時も博士の列を揃える
+   \draw[draw opacity=0](0,0)--(#1,-#2);%
 }
-\def\karifu@@{\@ifnextchar[{\@krifu@}{\@karifu@[0]}}
-\def\@karifu@[#1](#2,#3)#4#5{%
-  \dimen0=\f@size\p@\tanni=\gscale\dimen0
+\def\karifu@@{\@ifnextchar[{\@karifu@}{\@karifu@[0]}}
+\def\@karifu@[#1]{\@ifnextchar({\@k@rifu@[#1]}{\@k@rifu@[#1](1,0)}}
+\def\@k@rifu@[#1](#2,#3)#4#5{%
+  \dimen0=\f@size\p@\tanni=\gscale\dimen0%
   \hspace{#1\dimen0}%
-  \urubi[0pt]<c>{#4}{%
+  \urubi*[0pt]<c>{#4}{%
 %\fboxsep=0pt\fbox{%
-  \hakase{\orig{#2}{#3}#4}%
+  \hakase{\orig{#2}{#3}#5}%
 %}%fbox
   }%
-  \ifluatex
-    \ltjsetparameter{kanjiskip=(0pt plus0.1pt minus0.1pt)}
-  \else
-    \kanjiskip=0pt plus0.1pt minus0.1pt
-  \fi
+  \ifluatex%
+    \ltjsetparameter{kanjiskip={0pt plus0.1pt minus0.1pt}}%
+  \else%
+    \kanjiskip=0pt plus0.1pt minus0.1pt%
+  \fi%
 }%
 %----------------
 %グループ仮譜
@@ -281,7 +284,8 @@
 \newcount\@cnt
 \newcount\@@cnt
 \newcount\@@@cnt
-\def\Karifu{\@ifnextchar[{\@Karifu}{\@Karifu@}}
+\def\Karifu{\@ifstar{\s@K@rifu}{\@K@rifu}}
+\def\@K@rifu{\@ifnextchar[{\@Karifu}{\@Karifu@}}
 \def\@Karifu@#1#2{\leavevmode\@cnt=\z@%
 \@for\member:=#1\do{\advance\@cnt\@ne\@@cnt=\z@%
 \@for\Member:=#2\do{\advance\@@cnt\@ne%
@@ -296,6 +300,41 @@
 \ifnum\@@cnt=\@@@cnt\relax%
 %\typeout{\member}
 \karifu[\member]{\m@mber}{\m@mb@r}\fi\fi}}}}
+%
+\def\s@K@rifu#1#2{\leavevmode\@cnt=\z@%
+\@for\member:=#1\do{\advance\@cnt\@ne\@@cnt=\z@%
+\@for\Member:=#2\do{\advance\@@cnt\@ne%
+\ifnum\@cnt=\@@cnt\relax%
+\karifu*{\member}{\Member}\fi}}}
+%-----------
+% 助音
+%-----------
+%\def\joonn(#1,#2){\@ifnextchar[{\@joonn(#1,#2)}{\@joonn(#1,#2)[c]}}
+\def\joonn(#1,#2)#3{%
+  \let\orig@picture\@picture%
+  \let\orig@gscale\gscale%
+  \let\orig@mojisize\mojisize%
+  \def\gscale{0.4}%
+%
+  \def\mojisize{1.2}%
+  \karifu(#1,#2)[b]{\relax}{\moji[w]{助音}}<1,0>%
+%
+  \def\@picture##1{%
+    \fboxsep=3pt\fbox{%
+      \begin{tikzpicture}[x=\tanni,y=\tanni%
+       ,inner sep=0pt%
+       ,outer sep=0pt%
+       ]%
+       ##1%
+      \end{tikzpicture}%
+    }
+  }%
+  \karifu(#1,#2)[t]{\relax}{#3}<0,0>%
+  \let\mojisize\orig@mojisize%
+  \let\gscale\orig@gscale%
+  \let\@picture\orig@picture%
+}
+%
 %-----------
 % 移動コマンド
 %-----------
@@ -403,14 +442,14 @@
   \else\if#1n
     \if\p@cap0\edef\@okuri{0}\else\Add{#2}{\p@cap}{\@okuri}\fi
     \nxtpt(\ax,\ay)(\@ngl:\@okuri)(\@x,\@y)%
-  \else\@@@maeshori{#2}
+  \else\@@@maeshori{#2}%
   \fi\fi
 }
 \def\@atoshori#1{%
-  \Add{#1}{\sukima}{\p@cap}
-  \edef\p@ngl{\@ngl}
-  \ifdim\@xmax\p@<\ax\p@\let\@xmax\ax\fi
-  \ifdim\@ymin\p@>\ay\p@\let\@ymin\ay\fi
+  \Add{#1}{\sukima}{\p@cap}%
+  \edef\p@ngl{\@ngl}%
+  \ifdim\@xmax\p@<\ax\p@\let\@xmax\ax\fi%
+  \ifdim\@ymin\p@>\ay\p@\let\@ymin\ay\fi%
 %\typeout{\@xmax,\@ymin,\@x,\@y}
 }
 %-------------------------------
@@ -449,18 +488,18 @@
 \def\hkak{\base(\hk:\nagasa)}%
 \def\han{\base(\k:\h@lf)}%
 
-\def\chi{\base(\c:\nagasa)}%
-\def\lchi{\base(\lc:\nagasa)}%
+\def\cii{\base(\c:\nagasa)}%
+\def\lcii{\base(\lc:\nagasa)}%
 
 \def\woo{\base(\w:\nagasa)}%
 \def\lwoo{\base(\lw:\nagasa)}%
 %
-\def\宮{\qyu}\def\商{\sho}\def\角{\kak}\def\徴{\chi}\def\羽{\woo}
+\def\宮{\qyu}\def\商{\sho}\def\角{\kak}\def\徴{\cii}\def\羽{\woo}
 \def\三宮{\hqyu}\def\三商{\hsho}\def\三角{\hkak}
-\def\初徴{\lchi}\def\初羽{\lwoo}
+\def\初徴{\lcii}\def\初羽{\lwoo}
 %---------------------
 %　カカル
-% \kakakru{<音階方向>}
+% \kakaru{<音階方向>}
 %---------------------
 \def\kakaru#1{%
   \edef\@ngl{#1}%
@@ -520,9 +559,10 @@
 %
   \begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni]
    \draw[rotate=\@ngl,line width=\habaw\tanni,cap=round]
-  	(0,0) -- ++(0:0.35)++(0:0.25) -- +(0:0.35);% 
+%  	(0,0) -- ++(0:0.5)++(0:0.3) -- +(0:0.35);% 
+  	(0,0) -- (0.5,0)++(0.3,0) -- +(0.35,0);% 
   \end{scope}
-  \nxtpt(\@x,\@y)(\@ngl:0.95)(\ax,\ay)%
+  \nxtpt(\@x,\@y)(\@ngl:1.15)(\ax,\ay)%
   \@atoshori{\@capw}
 %
 }\def\ツキユリ{\tsukiyuri}
@@ -603,7 +643,7 @@
 \def\yosho{\yobase(\s:\yonagasa)}\def\揚商{\yosho}
 \def\yohsho{\yobase(\hs:\yonagasa)}\def\揚三商{\yohsho}
 \def\hnkyu{\yobase(\q:\yonagasa)}\def\反宮{\hnqyu}
-\def\hnchi{\yobase(\c:\yonagasa)}\def\反徴{\hnchi}
+\def\hncii{\yobase(\c:\yonagasa)}\def\反徴{\hncii}
 \def\hnhqyu{\yobase(\hq:\yonagasa)}\def\反三宮{\hnhqyu}
 %--------------------------
 % ソリ
@@ -614,12 +654,15 @@
   \@maeshori{\@cap}
 %
   \nxtpt(\@x,\@y)(\@ngl:\sorinagasa)(\ax,\ay)%
-  \@r@u{\s@ngl}{45}{-45}%
-  \@r@u{\e@ngl}{150}{-150}%
+%  \@r@u{\s@ngl}{45}{-45}%
+%  \@r@u{\e@ngl}{150}{-150}%
+  \@r@u{\s@ngl}{30}{-30}%
+  \@r@u{\e@ngl}{140}{-140}%
   \begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni]%
    \draw [rotate=\@ngl,line width=\haba\tanni,cap=round]%
-        (0,0) .. controls%
-       +(\s@ngl:0.2) and +(\e@ngl:0.5) .. (\sorinagasa,0);%
+%        (0,0) .. controls%
+%       +(\s@ngl:0.2) and +(\e@ngl:0.5) .. (\sorinagasa,0);%
+         (0,0) to [out=\s@ngl,in=\e@ngl] (\sorinagasa,0);%2019/04/27
   \end{scope}
   \@atoshori{\@cap}
 }\def\ソリ{\sori}%
@@ -735,7 +778,7 @@
 %-------------------
 \def\yuriL#1{%呂由%
   \edef\@ngl{#1}%
-  \@maeshori{\@cap}
+  \@maeshori[n]{\@cap}
   \nxtpt(\@x,\@y)(\@ngl:0.85)(\ax,\ay)%
   \begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni]
    \draw [rotate=\@ngl,line width=\haba\tanni,cap=round]%
@@ -918,7 +961,7 @@
 %-------------------
 \def\yuge#1{%
   \edef\@ngl{#1}%
-  \@maeshori{\@cap}
+  \@maeshori[n]{\@cap}
   \begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni]%
    \draw [rotate=\@ngl,line width=\haba\tanni,cap=round]%
       (0,0) .. controls +(-80:0.6) and +(-100:0.6) .. (0.85,0);%
@@ -950,29 +993,31 @@
 %--------------------
 % 力のソリ
 %--------------------
-\def\chikara#1{%
-  \edef\@ngl{#1}%
+\def\chikara{\@ifnextchar[{\chik@ra}{\chik@ra[0]}}
+\def\chik@ra[#1]#2{%
+  \edef\@ngl{#2}%
   \@maeshori{\@cap}
-\Add{\nagasa}{0.1}{\@len}
+  \Add{\nagasa}{#1}{\@len}
   \nxtpt(\@x,\@y)(\@ngl:\@len)(\ax,\ay)%
   \begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni]%
-  \filldraw [rotate=\@ngl,rounded corners=0.1\tanni]
-   (-0.1,0) -- (\@len,0.1) -- (\@len,-0.1) -- cycle; %
+  \filldraw [rotate=\@ngl,rounded corners=0.04\tanni]
+    (0,0.04) -- (\@len,0.1) to [out=-30,in=30,out looseness=1.5,in looseness=1.5] (\@len,-0.1) -- (0,-0.04) -- cycle; %
   \end{scope}%
-  \@atoshori{\@cap}
+  \Add{\@capw}{0.1}{\@@capw}
+  \@atoshori{\@@capw}
 }\def\力{\chikara}%
 %----------------------
 % ツマル音
 %----------------------
-%\def\tsu{\@ifnextchar[{\@tsu}{\@tsu[\@ngl]}}%
-%\def\@tsu[#1]{%
-\def\tsu{%
-%  \def\@ngl{#1}
+\def\tsu{\@ifnextchar[{\@tsu}{\@tsu[\@ngl]}}%
+\def\@tsu[#1]{%
+%\def\tsu{%
+  \def\@@ngl{#1}
   \Add{\@okuri}{\@cap}{\@okuri}
   \nxtpt(\ax,\ay)(\p@ngl:\@okuri)(\@x,\@y)%
   \begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni]%
    \foreach \r in {-0.2,0,0.2} %
-   {\filldraw[rotate=\@ngl] (0.2,0)+(90:\r) circle [radius=0.05\tanni];}%
+   {\filldraw[rotate=\@@ngl] (0.2,0)+(90:\r) circle [radius=0.05\tanni];}%
   \end{scope}
   \nxtpt(\@x,\@y)(\@ngl:0.4)(\ax,\ay)%
   \@atoshori{\@cap}
@@ -1006,15 +1051,16 @@
 % 文字出力
 % \@moji(音階方向変位,方角で指定した方向への変位)[出力方角]{文字}
 %----------------------
-\def\moji{\@ifnextchar({\@moji}{\@@moji}}
-\def\@moji(#1,#2)[#3#4]#5{%
+%\def\moji{\@ifnextchar({\@moji}{\@@moji}}
+\def\@moji(#1,#2)[#3#4]<#5>#6{%
   \ifluatex
     \edef\@tempskip{\ltjgetparameter{kanjiskip}}%
     \ltjsetparameter{kanjiskip=-2pt plus 2pt minus 2pt}%
-    \setbox0\hbox{\tate\bfseries\fontsize{0.8\tanni}{0pt}\selectfont#5}%
+    \setbox0\hbox{\tate\bfseries\fontsize{#5\tanni}{0pt}\selectfont#6}%
     \ifcat#3a\edef\@p@s{\p@s[#3#4]}\else\def\@p@s{#3}\fi%
     \Mul{\@p@s}{45}{\@angl}%
-    \ifodd\@p@s\Add{#2}{0.1}{\@dd}\else\Add{#2}{0.2}{\@dd}\fi%
+%    \Add{#2}{0.1}{\@dd} % 2019/5/8
+    \ifodd\@p@s\Add{#2}{0.05}{\@dd}\else\Add{#2}{0.1}{\@dd}\fi%
     \nxtpt(\ax,\ay)(\@ngl:#1)(\@x,\@y)%
     \nxtpt(\@x,\@y)(\@angl:\@dd)(\@@x,\@@y)%
     \node[anchor=\@nker{\@p@s}]%
@@ -1023,10 +1069,11 @@
   \else
     \let\k@nji=\kanjiskip%
     \kanjiskip=-2pt plus 2pt minus 2pt%
-    \setbox0\hbox{\tate\bfseries\fontsize{0.8\tanni}{0pt}\selectfont#5}%
+    \setbox0\hbox{\tate\bfseries\fontsize{#5\tanni}{0pt}\selectfont#6}%
     \ifcat#3a\edef\@p@s{\p@s[#3#4]}\else\def\@p@s{#3}\fi%
     \Mul{\@p@s}{45}{\@angl}%
-    \ifodd\@p@s\Add{#2}{0.1}{\@dd}\else\Add{#2}{0.2}{\@dd}\fi%
+%    \Add{#2}{0.1}{\@dd} % 2019/5/8
+    \ifodd\@p@s\Add{#2}{0.05}{\@dd}\else\Add{#2}{0.1}{\@dd}\fi%
     \nxtpt(\ax,\ay)(\@ngl:#1)(\@x,\@y)%
     \nxtpt(\@x,\@y)(\@angl:\@dd)(\@@x,\@@y)%
     \node[anchor=\@nker{\@p@s}]%
@@ -1034,7 +1081,8 @@
     \let\kanjiskip=\k@nji%
   \fi
 }%
-\def\@@moji[#1#2]#3{\@moji(0,0)[#1#2]{#3}}
+\NewDocumentCommand\moji{D(){0,0} o D<>{\mojisize} m}{\@moji(#1)[#2]<#3>{#4}}%
+%\def\@@moji[#1#2]#3{\@moji(0,0)[#1#2]{#3}}
 %----------------------
 % 切り、息継ぎ
 %----------------------
@@ -1126,10 +1174,15 @@
   \@maeshori{\@cap}
   \@XYmove(\@x,\@y)(0.7,-0.4)(\ax,\ay)%
   \begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni]%
-   \draw [rotate=\@ngl,line width=\haba\tanni,cap=round]%
+   \draw [rotate=\@ngl,line width=\habaw\tanni,cap=round]%
         (0,0) -- (0.7,0)
  	.. controls +(0:0.3) and +(45:0.4) ..
  	(0.7,-0.4);% 
+%    \filldraw[rotate=\@ngl,cap=round]
+%      (0,-0.05) arc[start angle=200,end angle=-20,%
+%                x radius=0.4,y radius=0.1]-- cycle;
+%    \filldraw[rotate=\@ngl,join=round]
+%      (0.6,-0.03)--(0.56,-0.3)--(0.6,-0.3)--(0.77,-0.03)--cycle;
   \end{scope}
 % 後処理
 %  \Add{\@ngl}{225}{\p@ngl}%
@@ -1209,61 +1262,63 @@
   \end{scope}
   \nxtpt(\@x,\@y)(\@ngl:0.46)(\ax,\ay)
   \nxtpt(\ax,\ay)(\@slop:0.6)(\ax,\ay)
-\@atoshori{\@cap}
+  \@atoshori{\@cap}
 }\def\ユリアゲ{\yuriage}
 %---------------------
 % 根音
 %---------------------
-\def\negoe#1{%
+\def\negoe#1{% 2019/04/24
   \edef\@ngl{#1}%
+%  \Mul{#1}{0.5}{\@@cap}%cap長を設定
   \@maeshori{\@cap}
-%  \@move(\@x,\@y)(-110:0.06)(\@rx,\@ry)
-%  \@move(\@x,\@y)(70:0.06)(\@lx,\@ly)
-%  \Add{\@ngl}{-120}{\@tail}%
-%  \Add{\@ngl}{-20}{\@head}%
-%  \Add{\@ngl}{-60}{\@cin}%
-%  \Add{\@ngl}{120}{\@cout}%
-%  \@move(\@x,\@y)(60:0.62)(\@cix,\@ciy)%
-%  \@move(\@x,\@y)(60:0.5)(\@cox,\@coy)%
-%  \@XYmove(\@x,\@y)(0.3,1.5)(\ax,\ay)%
-%  \filldraw [rounded corners=0.06\tanni]
-%  (\@rx,\@ry) 
-%  .. controls +(\@head:0.4) and +(\@cin:0.4) .. (\@cix,\@ciy)%
-%  .. controls +(\@cout:0.3) and +(\@tail:0.5) .. (\ax,\ay)%
-%  .. controls +(\@tail:0.7) and +(\@cout:0.3) .. (\@cox,\@coy)%
-%  .. controls +(\@cin:0.2) and +(\@head:0.22) .. (\@lx,\@ly) -- cycle;
-  \begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni,rotate=\@ngl,%
-                line width=\haba\tanni,cap=round]%
-   \draw (0,0) to [out=0,in=-90,out looseness=1.5,in looseness=0.5](0.3,0.95);
+  \begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni]%
+   \filldraw [rotate=\@ngl,rounded corners=0.06\tanni]%
+   (0,\@capn) to %
+   [out=0,in=-160,out looseness=0.5,in looseness=1.7]%
+   (1.0,1.0) to%
+   [out=-150,in=0,out looseness=1.6,in looseness=0.6]%
+   (0,-\@capn)--cycle;
   \end{scope}
-  \@XYmove(\@x,\@y)(0.3,1.0)(\ax,\ay)%
-  \@atoshori{\@cap}
+  \@XYmove(\@x,\@y)(1.0,1.0)(\ax,\ay)%
+  \@atoshori{\@cap}%
 }\def\根音{\negoe}
+%\def\negoe#1{%
+%  \edef\@ngl{#1}%
+%  \@maeshori{\@cap}
+%  \begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni,rotate=\@ngl,%
+%                line width=\haba\tanni,cap=round]%
+%   \draw (0,0) to [out=0,in=-90,out looseness=1.5,in looseness=0.5](0.3,0.95);
+%  \end{scope}
+%  \@XYmove(\@x,\@y)(0.3,1.0)(\ax,\ay)%
+%  \@atoshori{\@cap}
+%}\def\根音{\negoe}
 %---------------------
 % 引く
 %---------------------
 \def\hiku#1{%
   \edef\@ngl{#1}%
   \@maeshori{\@cap}
-  \@move(\@x,\@y)(0:0.8)(\@@x,\@@y)%
-  \@move(\@@x,\@@y)(45:0.5)(\ax,\ay)%
-%  \Add{\@ngl}{45}{\@start}
-%  \Add{\@ngl}{-195}{\@min}
-%  \Add{\@ngl}{-15}{\@mout}
-%  \Add{\@ngl}{-60}{\@end}
-\begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni,rotate=\@ngl]%
-  \draw[line width=\haba\tanni,cap=round]%
-  (0,0)
-  .. controls +(45:0.05) and +(-195:0.5) .. ++(0:0.8)
-  .. controls +(-15:0.35) and +(-60:0.35)  .. +(45:0.5); 
-\end{scope}
+%
+  \Add{\@ngl}{30}{\@@ngl}%2019/04/28
+  \Mul{\nagasa}{1.4}{\@nagasa}
+  \nxtpt(\@x,\@y)(\@@ngl:\@nagasa)(\ax,\ay)%
+  \begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni]%
+   \draw[rotate=\@ngl,line width=\haba\tanni,cap=round]%
+   (0,0) to [out=-10,in=-60,out looseness=1.5,in looseness=1.5] (30:\@nagasa);%
+  \end{scope}
+  \@atoshori{\@cap}
+%
+%  \@move(\@x,\@y)(0:0.8)(\@@x,\@@y)%
+%  \@move(\@@x,\@@y)(45:0.5)(\ax,\ay)%
+%\begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni,rotate=\@ngl]%
 %  \draw[line width=\haba\tanni,cap=round]%
-%  (\@x,\@y)
-%  .. controls +(\@start:0.05) and +(\@min:0.5) .. (\@@x,\@@y)
-%  .. controls +(\@mout:0.35) and +(\@end:0.35)  .. (\ax,\ay);
+%  (0,0)
+%  .. controls +(45:0.05) and +(-195:0.5) .. ++(0:0.8)
+%  .. controls +(-15:0.35) and +(-60:0.35)  .. +(45:0.5); 
+%\end{scope}
 % 後処理
-  \Add{\@cap}{\sukima}{\p@cap}
-  \Add{\@ngl}{45}{\p@ngl}
+%  \Add{\@cap}{\sukima}{\p@cap}
+%  \Add{\@ngl}{45}{\p@ngl}  2019/04/28
 }\def\引ク{\hiku}
 %---------------------
 % 押す
@@ -1343,7 +1398,7 @@
 %--------------------
 \def\iro@[#1]#2(#3,#4)#5{%
   \edef\@ngl{#2}%
-  \@maeshori{\@cap}
+  \@maeshori[n]{\@cap}
   \def\@wave@len{0.3}%イロ波長パラメーター
   \def\@repeat{#1}%イロ回数パラメーター
   \Mul{\@repeat}{\@wave@len}{\@irospan}
@@ -1361,9 +1416,24 @@
   \@XYmove(\@x,\@y)(\@totalLength,\@height@)(\ax,\ay)%
   \@atoshori{\@cap}
 }
+\def\mochi@iro[#1](#2,#3){% #1:線幅 \@ngl:継続 #2:モチ長さ
+  \Mul{#1}{0.5}{\@@cap}% cap長を設定
+  \def\p@cap{0}% 密着
+  \@maeshori{0}% 密着
+  \@r@l{\@amp}{-#3}{#3}% モチ振幅パラメーター
+  \@r@l{\@angl}{60}{-60}% モチ角度パラメーター
+  \@XYmove(\@x,\@y)(#2,\@amp)(\ax,\ay)%
+  \begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni,%
+                line width=#1\tanni,cap=round]%
+   \draw[rotate=\@ngl]%
+   (0,0) to [out=\@angl,in=-180,out looseness=1.5,in looseness=1] (#2,\@amp);%
+  \end{scope}
+  \@atoshori{\@@cap}%
+}%
 \def\iro{\@ifnextchar[{\iro@@}{\iro@@[3]}}
-%\def\iro@@[#1]#2{\iro@[#1]{#2}(0,1)(1,0.7)(2,0.7){\haba}}
-\def\iro@@[#1]#2{\iro@[#1]{#2}(0.9,0.9){\haba}\mochi[\haba]{0.4}}
+%\def\iro@@[#1]#2{\iro@[#1]{#2}(0.9,0.9){\haba}\mochi[\haba]{0.4}}
+\def\iro@@[#1]#2{%
+\irotome[#1]{#2}\mochi@iro[\haba](0.7,-0.3)}
 \def\イロ{\iro}%
 %--------------------
 % イロトメ
@@ -1492,13 +1562,13 @@
 \def\tsuya#1{%
   \edef\@ngl{#1}%
   \@maeshori{\@cap}
-  \def\@len{1.4}
+  \def\@len{1.75}
   \nxtpt(\@x,\@y)(\@ngl:\@len)(\ax,\ay)%
   \begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni,%
                 line width=\haba\tanni,cap=round]%
    \draw[rotate=\@ngl]%
         [decorate,decoration={snake,segment length=0.55\tanni,%
-         amplitude=0.08\tanni,post length=0\tanni,pre length=0\tanni}]%
+         amplitude=-0.08\tanni,post length=0\tanni,pre length=0\tanni}]%
         (0,0)--(\@len,0);%
   \end{scope}%
   \@atoshori{\@cap}
@@ -1615,10 +1685,10 @@
 }
 %\def\@@hiki(#1,#2)[#3]#4{\hikidashi(#1,0)(#1,#2)[#3]{#4}}
 %-------------------
-% カカリ
-% kakari
+% スエル
+% sueru
 %-------------------
-\def\kakari#1{%
+\def\sueru#1{%
   \edef\@ngl{#1}%
   \@maeshori{\@capw}
   \nxtpt(\@x,\@y)(\@ngl:0.5)(\ax,\ay)%
@@ -1628,7 +1698,7 @@
      (0,0) .. controls +(-80:0.25) and +(-100:0.25) .. +(0:0.5);%
     \end{scope}%
   \@atoshori{\@capw}
-}\def\カカリ{\kakari}
+}\def\スエル{\sueru}
 %-------------------
 % カナ当リ
 % kanaatari
@@ -1648,4 +1718,44 @@
   \end{scope}%
   \@atoshori{\@cap}
 }\def\カナ当{\kanaatari}\def\カナ当リ{\kanaatari}
-\def\kanaAtari{\kanaatari\nl{0.7}\chi}
+\def\kanaAtari{\kanaatari\nl{0.7}\cii}
+%--------------------
+% 和にハヌル
+% wanihanuru
+%--------------------
+\def\wanihanuru#1{%
+  \edef\@ngl{#1}%
+  \@maeshori{\@cap}
+%
+  \nxtpt(\@x,\@y)(\@ngl:\nagasa)(\ax,\ay)%
+  \begin{scope}[xshift=\@x\tanni,yshift=\@y\tanni]%
+   \draw [rotate=\@ngl,line width=\haba\tanni,cap=round,rounded corners=0.08\tanni]%
+        (0,0) -- (\nagasa,0) -- +(-120:0.3);%
+  \end{scope}
+  \@atoshori{\@cap}
+}
+%--------------------
+% 詰め
+% tsume
+%--------------------
+\def\tsume{\def\p@cap{0}}
+%--------------------
+% イロ後根音
+% ironego
+%--------------------
+\def\ironego#1{%
+  \iro@[2]{#1}(1.0,0.8){\haba}\tsume\negoe{#1}%
+}
+%--------------------
+% かかり
+% kakari
+%--------------------
+\def\kakari#1{%
+  \edef\@ngl{#1}%
+  \@maeshori{\@capw}
+   \begin{scope}[line width=\habaw\tanni,
+    xshift=\@x\tanni,yshift=\@y\tanni]%
+    \draw [rotate=\@ngl,cap=round](0,0) -- (60:0.3);
+   \end{scope}
+   \def\p@cap{0}
+}\def\カカリ{\kakari}%

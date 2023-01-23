@@ -93,28 +93,32 @@ p\LaTeX/up\LaTeX 及びlua\LaTeX 用のスタイルファイルである。
  \verb|\karifu{ ~ }{ ~ }      -> \karifu(0,0)[ c ]{ ~ }{ ~ }|
 \begin{tabbing}
  \verb|〈tbc〉　　　 |\=： 文字と譜の位置揃え、\verb|t:上揃え、b:下揃え、c:中央揃え|\\
- \verb|〈音符右移動〉|\>：音符のみ右に移動、左は負値。文字間隔の調整に用いる。\\
+ \verb|〈音符右移動〉|\>：音符のみ右に移動、左は負値。親文字との間隔の調整に用いる。\\
  \verb|〈全体上移動〉|\>：文字と音符全体が上に移動、下は負値。親文字に対する相対サイズで指定。\\
  \verb|\gscale|\>：文字に対する相対サイズ。
  描画単位\verb|\tanni=\gscale ×〈文字サイズ〉|。\\
  \>：初期値は\verb|\gscale=0.5|である。
 \end{tabbing}
- 縦書きでは、文字の左横に声明仮譜を描く、横書きでは文字の下に描く。\\
+親文字列の横に声明仮符を描く命令。声明仮譜は、縦書きでは文字の左横に、横書きでは文字の下に描かれる。字間の規定値は親文字間隔\\
 例）呂の\verb|\karifu{ユリ}{\yuriL{\c}}|
 \hspace{2em}\fbox{\hbox{呂の\karifu{ユリ}{\yuriL{\c}}}}\\
 例）呂の\verb|\def\gscale{1}\karifu{ユリ}{\yuriL{\c}}|
 \hspace{2em}\fbox{\hbox{\tate 呂の\def\gscale{1}\karifu{ユリ}{\yuriL{\c}}}}
 \end{function}
-\begin{function}{\Karifu}
-グループ仮符\\
+\begin{function}{\karifu*}
+ \verb|\karifu*(〈x方向変位〉,〈y方向変位〉){〈文字列〉}{〈音符命令〉}|\\
+ \verb|\karifu*{ ~ }{ ~ } -> \karifu*(0,0){ ~ }{ ~ }|\\
+ \verb|〈x方向変位〉,〈y方向変位〉|：親文字に対する仮符の位置変化。\\
+描画位置調整期能付き\verb|\karifu|。変位単位は\verb|\tanni|。\\
+\verb|\karifu|との違いは字間と仮符位置指定法。\\
+字間の規定値は親文字又は仮符の大きい方に合わせる。小さい方が中央に位置。
+\end{function}
+\begin{function}{\Karifu,\Karifu*}
  \verb|\Karifu[〈tbcリスト〉]{〈文字列リスト〉}{〈音符命令リスト〉}|\\
  \verb|\Karifu{〈文字列リスト〉}{〈音符命令リスト〉}|\\
-各リストはコンマ区切り。
+ \verb|\Karifu*{〈文字列リスト〉}{〈音符命令リスト〉}|\\
+グループ仮符。各リストはコンマ区切り。
 \end{function}
-%\begin{function}{\karifu*}
-% \verb|\karifu*(〈x方向変位〉,〈y方向変位〉){〈文字列〉}{〈音符命令〉}|\\
-%描画位置調整期能付き\verb|\karifu|。変位単位は\verb|\tanni|。 
-%\end{function}
 \section{音符命令}
 この節の命令は前節の\verb|\hakase,\karifu|の中で用いる。
 \setlength{\columnseprule}{0.5pt}
@@ -147,12 +151,12 @@ p\LaTeX/up\LaTeX 及びlua\LaTeX 用のスタイルファイルである。
 \begin{tabular}[t]{|c|c|c|}
 \multicolumn{3}{c}{表2.{\bf 基本音符}}\\\hline
 音階名&命 令&別 名\\\hline\hline
-初重徴 & {\bf \verb|\lchi|} & {\bf \verb|\初徴|} \\\hline
+初重徴 & {\bf \verb|\lcii|} & {\bf \verb|\初徴|} \\\hline
 初重羽&{\bf \verb|\lwoo|}&{\bf \verb|\初羽|} \\\hline
 二重宮&{\bf \verb|\qyu|}&{\bf \verb|\宮|} \\\hline
 二重商&{\bf \verb|\sho|}&{\bf \verb|\商|} \\\hline
 二重角&{\bf \verb|\kak|}&{\bf \verb|\角|} \\\hline
-二重徴&{\bf \verb|\chi|}&{\bf \verb|\徴|} \\\hline
+二重徴&{\bf \verb|\cii|}&{\bf \verb|\徴|} \\\hline
 二重羽&{\bf \verb|\woo|}&{\bf \verb|\羽|} \\\hline
 三重宮&{\bf \verb|\hqyu|}&{\bf \verb|\三宮|} \\\hline
 三重商&{\bf \verb|\hsho|}&{\bf \verb|\三商|} \\\hline
@@ -166,7 +170,7 @@ p\LaTeX/up\LaTeX 及びlua\LaTeX 用のスタイルファイルである。
 反宮&\verb|\hnqyu|&\verb|\反宮|\\\hline
 揚商 &\verb|\yosho|&\verb|\揚商|\\\hline
 &&\\\hline
-反徴&\verb|\hnchi|&\verb|\反徴|\\\hline
+反徴&\verb|\hncii|&\verb|\反徴|\\\hline
 揚羽 &\verb|\yowoo|&\verb|\揚羽|\\\hline
 反三宮&\verb|\hnhqyu|&\verb|\反三宮|\\\hline
 揚三商 &\verb|\yohsho|&\verb|\揚三商|\\\hline
@@ -320,21 +324,21 @@ p\LaTeX/up\LaTeX 及びlua\LaTeX 用のスタイルファイルである。
  \verb|\kiri  =  \kiri[〈現在の音階の角度〉- 90]|\\
  \verb|\きり  =  \kiriの別名|\\
  方位指定方法は前述。\\
- 例）\verb|\chi\kiri\chi|\hspace{2em}\parbox{2cm}{\fu{\chi\kiri\chi}}
+ 例）\verb|\cii\kiri\cii|\hspace{2em}\parbox{2cm}{\fu{\cii\kiri\cii}}
 \end{function} 
 \begin{function}{\kili,\キリ}
  音階方向に向かって左側にマーク\\
  \verb|\kili[〈方位指定〉]| \\
  \verb|\kili  =  \kiri[〈現在の音階の角度〉+ 90]|\\
  \verb|\キリ  =  \kiliの別名|\\
-例）\verb|\chi\kili\chi|\hspace{2em}\parbox{2cm}{\fu{\chi\kili\chi}}
+例）\verb|\cii\kili\cii|\hspace{2em}\parbox{2cm}{\fu{\cii\kili\cii}}
 \end{function} 
 
  %\item[ツマル音]{　}
 \begin{function}{\tsu}
  \verb|\tsu|\\
  ツマル音\\
- 例）\verb|\chi\tsu|\hspace{2em}\parbox[t]{2cm}{\fu{\chi\tsu}}
+ 例）\verb|\cii\tsu|\hspace{2em}\parbox[t]{2cm}{\fu{\cii\tsu}}
 \end{function} 
 \begin{function}{\mawasu,\マワス}
  \textbf{マワス}一音ずつ連続的に音を下げる\\
@@ -360,10 +364,21 @@ p\LaTeX/up\LaTeX 及びlua\LaTeX 用のスタイルファイルである。
 \verb|\流し  =  \nagashi の別名|
 \hspace{2em}\parbox[b]{2cm}{\fu{\nagashi}}
 \end{function}
+\begin{function}{\sueru,\スエル}
+\verb|\sueru{〈音階方向〉}|\\
+\verb|\スエル  =  \sueru の別名|
+\hspace{2em}\parbox[b]{2cm}{\fu{\sueru{\s}}}\\
+この譜に同音の譜が続いて本来のスエルの譜となるが続く譜の自由度を考慮してこの形とした。\\
+\verb|\sueru{\s}\sho|
+\hspace{2em}\parbox[b]{2cm}{\fu{\sueru{\s}\sho}}
+\end{function}
 \begin{function}{\kakari,\カカリ}
 \verb|\kakari{〈音階方向〉}|\\
 \verb|\カカリ  =  \kakari の別名|
-\hspace{2em}\parbox[b]{2cm}{\fu{\kakari{\s}}}
+\hspace{2em}\parbox[b]{2cm}{\fu{\kakari{\s}}}\\
+この譜に同音の譜が続いて\verb|\カカル|となる。\\
+\verb|\kakari{\c}\cii|\hspace{2em}\parbox[b]{2cm}{\fu{\kakari{\c}\cii}}\\
+\verb|\kakaru{\c}|\hspace{2em}\parbox[b]{2cm}{\fu{\kakaru{\c}}}\\
 \end{function}
 \begin{function}{\kanaatari,\カナ当リ}
 \verb|\kanaatari{〈音階方向〉}|\\
@@ -371,7 +386,7 @@ p\LaTeX/up\LaTeX 及びlua\LaTeX 用のスタイルファイルである。
 \verb|\カナ当　  =  \kanaatari の別名|\\
 \verb|\カナ当リ  =  \kanaatari の別名|
 \hspace{2em}\parbox[b]{2cm}{\fu{\kanaatari}}\\
-\verb|\kanaAtari  =  \kanaatari\nl{0.7}\chi|
+\verb|\kanaAtari  =  \kanaatari\nl{0.7}\cii|
 \hspace{2em}\parbox[b]{2cm}{\fu{\kanaAtari}}
 \end{function}
 \subsection{移動命令}
@@ -410,7 +425,7 @@ p\LaTeX/up\LaTeX 及びlua\LaTeX 用のスタイルファイルである。
   e&ne&n&nw&w&sw&s&se\\\hline
   0&1&2&3&4&5&6&7\\\hline
  \end{tabular}\\
- 例）\verb|\chi\chi\moji(-0.3,0)[ne]{長}|\hspace{2em}\tanni=1em\hakase{\chi\chi\moji(-0.3,0)[ne]{長}}
+ 例）\verb|\cii\cii\moji(-0.3,0)[ne]{長}|\hspace{2em}\tanni=1em\hakase{\cii\cii\moji(-0.3,0)[ne]{長}}
 \end{function}
 \begin{function}{\chou,\長,\tann,\矢}
  \textbf{長短}：音の長さを指定\\
@@ -418,7 +433,7 @@ p\LaTeX/up\LaTeX 及びlua\LaTeX 用のスタイルファイルである。
  \verb|\長  =  \chou の別名|\\
  \verb|\tann[〈方位指定〉]|\\
  \verb|\矢  =  \tann の別名、短の字の偏(へん)|\\
- 例）\verb|\chi\矢[sw]\chi\長[ne]|\hspace{2em}\tanni=1em\hakase{\chi\矢[sw]\chi\長[ne]}
+ 例）\verb|\cii\矢[sw]\cii\長[ne]|\hspace{2em}\tanni=1em\hakase{\cii\矢[sw]\cii\長[ne]}
 \end{function}
 
 \begin{function}{\hikidashi}
