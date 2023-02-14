@@ -12,6 +12,19 @@
 \newcommand{\HUGE}{\@setfontsize\HUGE{40}{48}}
 \newcommand{\HUGe}{\@setfontsize\HUGe{36}{42}}
 \newcommand{\wari}{\@setfontsize\wari{30}{36}}
+%--------------------------------------
+%  l@for:  @forの区切り記号を"|"に変更 
+%  latex.ltx より抽出改変 2023/02/12
+%--------------------------------------
+\long\def\l@for#1:=#2\do#3{%
+  \expandafter\def\expandafter\@fortmp\expandafter{#2}%
+  \ifx\@fortmp\@empty \else
+    \expandafter\l@forloop#2|\@nil|\@nil\@@#1{#3}\fi}
+\long\def\l@forloop#1|#2|#3\@@#4#5{\def#4{#1}\ifx #4\@nnil \else
+       #5\def#4{#2}\ifx #4\@nnil \else#5\l@iforloop #3\@@#4{#5}\fi\fi}
+\long\def\l@iforloop#1|#2\@@#3#4{\def#3{#1}\ifx #3\@nnil
+       \expandafter\@fornoop \else
+      #4\relax\expandafter\l@iforloop\fi#2\@@#3{#4}}
 %---------
 % 四則演算
 %---------
@@ -230,13 +243,14 @@
 %-------------------------
 % 仮譜
 %-------------------------
-\def\karifu{\@ifstar{\karifu@@}{\karifu@}}%
-%-------------------------
 % \karifu{ 親字 }{ 博士 }
 % \karifu[ tcb ]{ 親字 }{ 博士 }
 % \karifu( 博士右移動 , 親字上移動 )[ tcb ]{ 親字 }{ 博士 }< 初期x , 初期y > 単位は親字サイズ
 %-------------------------
-%\def\karifu@{\@ifnextchar({\@karifu}{\@@karifu}}%
+%博士の右に文字領域を確保、文字が無い時も博士の列を揃える
+\def\@origin(#1,#2){%
+   \draw[draw opacity=0](0,0)--(#1,-#2);%
+}%
 %
 \def\@karifu(#1,#2)[#3]#4#5<#6,#7>{%
   \dimen0=\f@size\p@\tanni=\gscale\dimen0%
@@ -246,66 +260,96 @@
   \Sub{\@kern}{#1}{\@kern@x}%2018/1/19
   \urubi[\@kern@x\dimen0]<#3>{#4}{%
 %\fboxsep=0pt\fbox{%
-   \hakase{\orig{#6}{#7}#5}%2019/1/11
+    \hakase{\@origin(#6,#7)#5}%2019/1/11
 %}%
- }%
+  }%
 }%
-%\def\@@karifu{\@ifnextchar\bgroup{\@@@karifu}{\@@@@karifu}}%
-%\def\@@@karifu#1#2{\@karifu(0,0)[c]{#1}{#2}}%
-%\def\@@@@karifu[#1]#2#3{\@karifu(0,0)[#1]{#2}{#3}}%
-\NewDocumentCommand\karifu@{D(){0,0} O{c} m m D<>{1,0}}{\@karifu(#1)[#2]{#3}{#4}<#5>}%
+\def\@@karifu(#1,#2)[#3]#4#5<#6,#7>{%
+  \dimen0=\f@size\p@\tanni=\gscale\dimen0%
+  \hspace{-#2\dimen0}%2018/1/19
+  \Sub{\@kern}{#1}{\@kern@x}%2018/1/19
+  \urubi*[\@kern@x\dimen0]<#3>{#4}{%
+    \hakase{\@origin(#6,#7)#5}%2019/1/11
+  }%
+}%
+\NewDocumentCommand\karifu{s D(){0,0} O{c} m m D<>{1,0}}
+{%
+  \IfBooleanTF{ #1 }%
+    {\@@karifu(#2)[#3]{#4}{#5}<#6>}%
+    {\@karifu(#2)[#3]{#4}{#5}<#6>}%
+}%
+
 %-------------------------------
 % 親字に対する博士の相対移動
 % 正方向　(左,上)
 % \karifu*[<字間変化>](<左右移動>,<上下移動>){<親字>}{<博士>}
 %-------------------------------
-\def\orig#1#2{%博士の右に文字領域を確保、文字が無い時も博士の列を揃える
-   \draw[draw opacity=0](0,0)--(#1,-#2);%
-}
-\def\karifu@@{\@ifnextchar[{\@karifu@}{\@karifu@[0]}}
-\def\@karifu@[#1]{\@ifnextchar({\@k@rifu@[#1]}{\@k@rifu@[#1](1,0)}}
-\def\@k@rifu@[#1](#2,#3)#4#5{%
-  \dimen0=\f@size\p@\tanni=\gscale\dimen0%
-  \hspace{#1\dimen0}%
-  \urubi*[0pt]<c>{#4}{%
-%\fboxsep=0pt\fbox{%
-  \hakase{\orig{#2}{#3}#5}%
-%}%fbox
+%\def\karifu@@{\@ifnextchar[{\@karifu@}{\@karifu@[0]}}
+%\def\@karifu@[#1]{\@ifnextchar({\@k@rifu@[#1]}{\@k@rifu@[#1](1,0)}}
+%\def\@k@rifu@[#1](#2,#3)#4#5{%
+%  \def\@pos{c}%
+%  \ifdim #3 pt >0 pt \let\@pos=b \else \ifdim #3 pt<0 pt \let\@pos=t\fi\fi
+%  \dimen0=\f@size\p@\tanni=\gscale\dimen0%
+%  \hspace{#1\dimen0}%
+%  \urubi*[0pt]<\@pos>{#4}{%
+%%\fboxsep=0pt\fbox{%
+%  \hakase{\@origin(#2,#3)#5}%
+%%}%fbox
+%  }%
+%  \ifluatex%
+%    \ltjsetparameter{kanjiskip={0pt plus0.1pt minus0.1pt}}%
+%  \else%
+%    \kanjiskip=0pt plus0.1pt minus0.1pt%
+%  \fi%
+%}%
+%----------------
+%グループ仮譜 2023/02/14
+%----------------
+\NewDocumentCommand\Karifu{s O{} m m}{%
+  \newcount\@cnt%
+  \newcount\@@cnt%
+  \newcount\@@@cnt%
+  \IfBooleanTF { #1 }%
+  {%
+    \IfBlankTF { #2 }%
+      {%
+        \leavevmode\@cnt=\z@%
+      	\l@for\member:=#3\do{\advance\@cnt\@ne\@@cnt=\z@%
+      	\l@for\Member:=#4\do{\advance\@@cnt\@ne%
+      	\ifnum\@cnt=\@@cnt\relax%
+      	\karifu*{\member}{\Member}\fi}}%
+      }%
+      {%
+        \leavevmode\@cnt=\z@%
+      	\l@for\member:=#2\do{\advance\@cnt\@ne\@@cnt=\z@%
+      	\l@for\m@mber:=#3\do{\advance\@@cnt\@ne\@@@cnt=\z@%
+      	\l@for\m@mb@r:=#4\do{\advance\@@@cnt\@ne%
+      	\ifnum\@cnt=\@@cnt\relax%
+      	\ifnum\@@cnt=\@@@cnt\relax%
+      	\karifu*[\member]{\m@mber}{\m@mb@r}\fi\fi}}}%
+      }%
   }%
-  \ifluatex%
-    \ltjsetparameter{kanjiskip={0pt plus0.1pt minus0.1pt}}%
-  \else%
-    \kanjiskip=0pt plus0.1pt minus0.1pt%
-  \fi%
-}%
-%----------------
-%グループ仮譜
-%----------------
-\newcount\@cnt
-\newcount\@@cnt
-\newcount\@@@cnt
-\def\Karifu{\@ifstar{\s@K@rifu}{\@K@rifu}}
-\def\@K@rifu{\@ifnextchar[{\@Karifu}{\@Karifu@}}
-\def\@Karifu@#1#2{\leavevmode\@cnt=\z@%
-\@for\member:=#1\do{\advance\@cnt\@ne\@@cnt=\z@%
-\@for\Member:=#2\do{\advance\@@cnt\@ne%
-\ifnum\@cnt=\@@cnt\relax%
-\karifu{\member}{\Member}\fi}}}
+  {%
+    \IfBlankTF { #2 }%
+      {%
+        \leavevmode\@cnt=\z@%
+      	\l@for\member:=#3\do{\advance\@cnt\@ne\@@cnt=\z@%
+      	\l@for\Member:=#4\do{\advance\@@cnt\@ne%
+      	\ifnum\@cnt=\@@cnt\relax%
+      	\karifu{\member}{\Member}\fi}}%
+      }%
+      {%
+        \leavevmode\@cnt=\z@%
+      	\l@for\member:=#2\do{\advance\@cnt\@ne\@@cnt=\z@%
+      	\l@for\m@mber:=#3\do{\advance\@@cnt\@ne\@@@cnt=\z@%
+      	\l@for\m@mb@r:=#4\do{\advance\@@@cnt\@ne%
+      	\ifnum\@cnt=\@@cnt\relax%
+      	\ifnum\@@cnt=\@@@cnt\relax%
+      	\karifu[\member]{\m@mber}{\m@mb@r}\fi\fi}}}%
+      }%
+    }%
+  }
 %
-\def\@Karifu[#1]#2#3{\leavevmode\@cnt=\z@%
-\@for\member:=#1\do{\advance\@cnt\@ne\@@cnt=\z@%
-\@for\m@mber:=#2\do{\advance\@@cnt\@ne\@@@cnt=\z@%
-\@for\m@mb@r:=#3\do{\advance\@@@cnt\@ne%
-\ifnum\@cnt=\@@cnt\relax%
-\ifnum\@@cnt=\@@@cnt\relax%
-%\typeout{\member}
-\karifu[\member]{\m@mber}{\m@mb@r}\fi\fi}}}}
-%
-\def\s@K@rifu#1#2{\leavevmode\@cnt=\z@%
-\@for\member:=#1\do{\advance\@cnt\@ne\@@cnt=\z@%
-\@for\Member:=#2\do{\advance\@@cnt\@ne%
-\ifnum\@cnt=\@@cnt\relax%
-\karifu*{\member}{\Member}\fi}}}
 %-----------
 % 助音
 %-----------

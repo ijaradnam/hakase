@@ -33,7 +33,7 @@
 \def\bs#1{\textbf{\texttt{\symbol{"5C}}#1}}%"
 \title{hakase.sty 使用法}
 \author{髙吉 清文}
-\date{ver.0.1 [\today]}
+\date{ver.0.2 [\today]}
 \usepackage{multicol}	% required for `\multicols' (yatex added)
 \usepackage{longtable,multirow,fancyvrb}
 \def\youso#1#2#3#4#5{#1&\shortstack{\vspace{0.1ex}\bs{#2}\\
@@ -86,38 +86,35 @@ p\LaTeX/up\LaTeX 及びlua\LaTeX 用のスタイルファイルである。
 例）これが呂のユリ\verb|\tanni=1em\hakase{\yuriL{\c}}|です。\\
 　　これが呂のユリ\tanni=1em\hakase{\yuriL{\c}}です。
 \end{function}
-\begin{function}{\karifu,\gscale}
+\begin{function}{\karifu,\karifu*,\gscale}
  \verb|\karifu(〈音符右移動〉,〈全体上移動〉)[〈tbc〉]{〈文字列〉}{〈音符命令〉}|\\
  \verb|\karifu[ ~ ]{ ~ }{ ~ } -> \karifu(0,0)[ ~ ]{ ~ }{ ~ }|\\
  \verb|\karifu( ~ ){ ~ }{ ~ } -> \karifu( ~ )[ c ]{ ~ }{ ~ }|\\
- \verb|\karifu{ ~ }{ ~ }      -> \karifu(0,0)[ c ]{ ~ }{ ~ }|
+ \verb|\karifu{ ~ }{ ~ }      -> \karifu(0,0)[ c ]{ ~ }{ ~ }|\\
+\newline
+親文字列の横に声明仮符を描く命令。声明仮譜は、縦書きでは文字の左横に、横書きでは文字の下に描かれる。字間の規定値は親文字間隔。
 \begin{tabbing}
  \verb|〈tbc〉　　　 |\=： 文字と譜の位置揃え、\verb|t:上揃え、b:下揃え、c:中央揃え|\\
  \verb|〈音符右移動〉|\>：音符のみ右に移動、左は負値。親文字との間隔の調整に用いる。\\
  \verb|〈全体上移動〉|\>：文字と音符全体が上に移動、下は負値。親文字に対する相対サイズで指定。\\
  \verb|\gscale|\>：文字に対する相対サイズ。
  描画単位\verb|\tanni=\gscale ×〈文字サイズ〉|。\\
- \>：初期値は\verb|\gscale=0.5|である。
+ \>：初期値は\verb|\gscale=0.5|である。\\
+\verb|\karifu*|\>：字間の設定法のみ\verb|\karifu|と異なる。\\
+\>：字間の規定値は\underline{親文字又は仮符の大きい方}に合わせる。
 \end{tabbing}
-親文字列の横に声明仮符を描く命令。声明仮譜は、縦書きでは文字の左横に、横書きでは文字の下に描かれる。字間の規定値は親文字間隔\\
 例）呂の\verb|\karifu{ユリ}{\yuriL{\c}}|
 \hspace{2em}\fbox{\hbox{呂の\karifu{ユリ}{\yuriL{\c}}}}\\
 例）呂の\verb|\def\gscale{1}\karifu{ユリ}{\yuriL{\c}}|
 \hspace{2em}\fbox{\hbox{\tate 呂の\def\gscale{1}\karifu{ユリ}{\yuriL{\c}}}}
 \end{function}
-\begin{function}{\karifu*}
- \verb|\karifu*(〈x方向変位〉,〈y方向変位〉){〈文字列〉}{〈音符命令〉}|\\
- \verb|\karifu*{ ~ }{ ~ } -> \karifu*(0,0){ ~ }{ ~ }|\\
- \verb|〈x方向変位〉,〈y方向変位〉|：親文字に対する仮符の位置変化。\\
-描画位置調整期能付き\verb|\karifu|。変位単位は\verb|\tanni|。\\
-\verb|\karifu|との違いは字間と仮符位置指定法。\\
-字間の規定値は親文字又は仮符の大きい方に合わせる。小さい方が中央に位置。
-\end{function}
+
 \begin{function}{\Karifu,\Karifu*}
  \verb|\Karifu[〈tbcリスト〉]{〈文字列リスト〉}{〈音符命令リスト〉}|\\
  \verb|\Karifu{〈文字列リスト〉}{〈音符命令リスト〉}|\\
+ \verb|\Karifu*[〈tbcリスト〉]{〈文字列リスト〉}{〈音符命令リスト〉}|\\
  \verb|\Karifu*{〈文字列リスト〉}{〈音符命令リスト〉}|\\
-グループ仮符。各リストはコンマ区切り。
+グループ仮符。各リストの区切り記号は“\verb+|+”。
 \end{function}
 \section{音符命令}
 この節の命令は前節の\verb|\hakase,\karifu|の中で用いる。
@@ -304,7 +301,7 @@ p\LaTeX/up\LaTeX 及びlua\LaTeX 用のスタイルファイルである。
  \>n\>：前符終点で屈曲後モドリ音階方向に空白が伸長\\
  \>他\>：前符とモドリの中間で折れ曲がる
 \end{tabbing}
- 連続する音符が干渉する場合のために
+ 連続する音符が干渉する場合のために\\
  戻り角度と始点の位置を変えた戻りも定義している。\\
  \verb|\modoli = \modori{-110}[p]|\\[5truemm]
 例）\verb|\角\modori\角|\hspace{2em}\fu{\kak\modori\kak}
