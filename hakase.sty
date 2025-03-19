@@ -16,15 +16,15 @@
 %  l@for:  @forの区切り記号を"|"に変更 
 %  latex.ltx より抽出改変 2023/02/12
 %--------------------------------------
-\long\def\l@for#1:=#2\do#3{%
-  \expandafter\def\expandafter\@fortmp\expandafter{#2}%
-  \ifx\@fortmp\@empty \else
-    \expandafter\l@forloop#2|\@nil|\@nil\@@#1{#3}\fi}
-\long\def\l@forloop#1|#2|#3\@@#4#5{\def#4{#1}\ifx #4\@nnil \else
-       #5\def#4{#2}\ifx #4\@nnil \else#5\l@iforloop #3\@@#4{#5}\fi\fi}
-\long\def\l@iforloop#1|#2\@@#3#4{\def#3{#1}\ifx #3\@nnil
-       \expandafter\@fornoop \else
-      #4\relax\expandafter\l@iforloop\fi#2\@@#3{#4}}
+%\long\def\l@for#1:=#2\do#3{%
+%  \expandafter\def\expandafter\@fortmp\expandafter{#2}%
+%  \ifx\@fortmp\@empty \else
+%    \expandafter\l@forloop#2|\@nil|\@nil\@@#1{#3}\fi}
+%\long\def\l@forloop#1|#2|#3\@@#4#5{\def#4{#1}\ifx #4\@nnil \else
+%       #5\def#4{#2}\ifx #4\@nnil \else#5\l@iforloop #3\@@#4{#5}\fi\fi}
+%\long\def\l@iforloop#1|#2\@@#3#4{\def#3{#1}\ifx #3\@nnil
+%       \expandafter\@fornoop \else
+%      #4\relax\expandafter\l@iforloop\fi#2\@@#3{#4}}
 %---------
 % 四則演算
 %---------
@@ -314,16 +314,16 @@
     \IfBlankTF { #2 }%
       {%
         \leavevmode\@cnt=\z@%
-      	\l@for\member:=#3\do{\advance\@cnt\@ne\@@cnt=\z@%
-      	\l@for\Member:=#4\do{\advance\@@cnt\@ne%
+      	\@for\member:=#3\do{\advance\@cnt\@ne\@@cnt=\z@%
+      	\@for\Member:=#4\do{\advance\@@cnt\@ne%
       	\ifnum\@cnt=\@@cnt\relax%
       	\karifu*{\member}{\Member}\fi}}%
       }%
       {%
         \leavevmode\@cnt=\z@%
-      	\l@for\member:=#2\do{\advance\@cnt\@ne\@@cnt=\z@%
-      	\l@for\m@mber:=#3\do{\advance\@@cnt\@ne\@@@cnt=\z@%
-      	\l@for\m@mb@r:=#4\do{\advance\@@@cnt\@ne%
+      	\@for\member:=#2\do{\advance\@cnt\@ne\@@cnt=\z@%
+      	\@for\m@mber:=#3\do{\advance\@@cnt\@ne\@@@cnt=\z@%
+      	\@for\m@mb@r:=#4\do{\advance\@@@cnt\@ne%
       	\ifnum\@cnt=\@@cnt\relax%
       	\ifnum\@@cnt=\@@@cnt\relax%
       	\karifu*[\member]{\m@mber}{\m@mb@r}\fi\fi}}}%
@@ -333,16 +333,16 @@
     \IfBlankTF { #2 }%
       {%
         \leavevmode\@cnt=\z@%
-      	\l@for\member:=#3\do{\advance\@cnt\@ne\@@cnt=\z@%
-      	\l@for\Member:=#4\do{\advance\@@cnt\@ne%
+      	\@for\member:=#3\do{\advance\@cnt\@ne\@@cnt=\z@%
+      	\@for\Member:=#4\do{\advance\@@cnt\@ne%
       	\ifnum\@cnt=\@@cnt\relax%
       	\karifu{\member}{\Member}\fi}}%
       }%
       {%
         \leavevmode\@cnt=\z@%
-      	\l@for\member:=#2\do{\advance\@cnt\@ne\@@cnt=\z@%
-      	\l@for\m@mber:=#3\do{\advance\@@cnt\@ne\@@@cnt=\z@%
-      	\l@for\m@mb@r:=#4\do{\advance\@@@cnt\@ne%
+      	\@for\member:=#2\do{\advance\@cnt\@ne\@@cnt=\z@%
+      	\@for\m@mber:=#3\do{\advance\@@cnt\@ne\@@@cnt=\z@%
+      	\@for\m@mb@r:=#4\do{\advance\@@@cnt\@ne%
       	\ifnum\@cnt=\@@cnt\relax%
       	\ifnum\@@cnt=\@@@cnt\relax%
       	\karifu[\member]{\m@mber}{\m@mb@r}\fi\fi}}}%

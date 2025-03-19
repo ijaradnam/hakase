@@ -33,7 +33,7 @@
 \def\bs#1{\textbf{\texttt{\symbol{"5C}}#1}}%"
 \title{hakase.sty 使用法}
 \author{髙吉 清文}
-\date{ver.0.2 [\today]}
+\date{ver.0.3 [\today]}
 \usepackage{multicol}	% required for `\multicols' (yatex added)
 \usepackage{longtable,multirow,fancyvrb}
 \def\youso#1#2#3#4#5{#1&\shortstack{\vspace{0.1ex}\bs{#2}\\
@@ -114,7 +114,7 @@ p\LaTeX/up\LaTeX 及びlua\LaTeX 用のスタイルファイルである。
  \verb|\Karifu{〈文字列リスト〉}{〈音符命令リスト〉}|\\
  \verb|\Karifu*[〈tbcリスト〉]{〈文字列リスト〉}{〈音符命令リスト〉}|\\
  \verb|\Karifu*{〈文字列リスト〉}{〈音符命令リスト〉}|\\
-グループ仮符。各リストの区切り記号は“\verb+|+”。
+グループ仮符。各リストの区切り記号は“\verb+,+”。%2025/03/19修正 pxrubricaと干渉のため
 \end{function}
 \section{音符命令}
 この節の命令は前節の\verb|\hakase,\karifu|の中で用いる。
